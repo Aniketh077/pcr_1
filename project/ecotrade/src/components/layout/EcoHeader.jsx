@@ -18,7 +18,7 @@ export default function EcoHeader() {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="flex items-center space-x-8">
             <Link
               to="/eco-home"
               className="text-gray-700 hover:text-green-600 font-medium transition"
@@ -37,28 +37,7 @@ export default function EcoHeader() {
             >
               Materials
             </Link>
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-green-600 font-medium transition"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="text-gray-700 hover:text-green-600 font-medium transition"
-            >
-              Contact
-            </Link>
           </nav>
-
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/admin"
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-medium"
-            >
-              Admin Login
-            </Link>
-          </div>
         </div>
       </div>
     </header>

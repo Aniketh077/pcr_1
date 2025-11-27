@@ -14,6 +14,7 @@ import EcoHomePage from "./pages/EcoHomePage";
 import MaterialsPage from "./pages/MaterialsPage";
 import MaterialDetailPage from "./pages/MaterialDetailPage";
 import RequestConfirmationPage from "./pages/RequestConfirmationPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEcoHome from "./pages/admin/AdminEcoHome";
 import AdminEcoIndustries from "./pages/admin/AdminEcoIndustries";
@@ -60,6 +61,9 @@ function EcoApp() {
               <Route path="/eco-materials" element={<MaterialsPage />} />
               <Route path="/eco-materials/:id" element={<MaterialDetailPage />} />
               <Route path="/request-confirmation/:requestId" element={<RequestConfirmationPage />} />
+
+              {/* Admin Login Route */}
+              <Route path="/admin/login" element={<AdminLoginPage />} />
 
               {/* Admin Routes */}
               <Route

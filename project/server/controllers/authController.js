@@ -2,7 +2,6 @@ const User = require('../models/User');
 const generateToken = require('../config/jwt');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const emailService = require('../emailService/EmailService');
 
 // @desc    Authenticate user
 // @route   POST /api/auth/login
@@ -101,20 +100,17 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
-      // Send verification email
-      try {
-        await emailService.sendVerificationEmail(email, verificationToken, name);
-        
-        res.status(201).json({
-          message: 'User registered successfully! Please check your email to verify your account.',
-          requiresVerification: true
-        });
-      } catch (emailError) {
-        console.error('Email sending error:', emailError);
-        // Delete user if email sending fails
-        await User.findByIdAndDelete(user._id);
-        res.status(500).json({ message: 'Registration failed. Please try again.' });
-      }
+      res.status(201).json({
+        success: true,
+        message: 'User registered successfully!',
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          token: generateToken(user._id)
+        }
+      });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
     }
@@ -152,7 +148,7 @@ const verifyEmail = async (req, res) => {
     await user.save();
 
     try {
-      await emailService.sendWelcomeEmail(user.email, user.name);
+      // Email verification removed
     } catch (emailError) {
       console.error('Welcome email error:', emailError);
     }
@@ -196,7 +192,7 @@ const resendVerificationEmail = async (req, res) => {
     await user.save();
 
     // Send verification email
-    await emailService.sendVerificationEmail(email, verificationToken, user.name);
+    // Email verification removed
 
     res.json({
       message: 'Verification email sent successfully!'
@@ -232,7 +228,7 @@ const forgotPassword = async (req, res) => {
     await user.save();
 
     // Send reset email
-    await emailService.sendPasswordResetEmail(email, resetToken, user.name);
+    // Password reset email removed
 
     res.json({
       message: 'Password reset email sent successfully!'

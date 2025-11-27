@@ -1,6 +1,5 @@
 const BuyerRequest = require('../models/BuyerRequest');
 const Material = require('../models/Material');
-const EmailService = require('../emailService/EmailService');
 
 exports.createRequest = async (req, res) => {
   try {
@@ -15,10 +14,17 @@ exports.createRequest = async (req, res) => {
       specifications
     } = req.body;
 
-    if (!buyerName || !buyerEmail || !buyerMobile || !companyName || !materialId || !requestedQuantity) {
+    if (!buyerName || !companyName || !materialId || !requestedQuantity) {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields'
+      });
+    }
+
+    if (!buyerEmail && !buyerMobile) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide either email or mobile number'
       });
     }
 
@@ -53,12 +59,6 @@ exports.createRequest = async (req, res) => {
 
     await buyerRequest.save();
     await buyerRequest.populate(['material', 'industry']);
-
-    try {
-      await EmailService.sendRequestConfirmation(buyerRequest, material);
-    } catch (emailError) {
-      console.error('Error sending confirmation email:', emailError);
-    }
 
     res.status(201).json({
       success: true,
@@ -284,12 +284,6 @@ exports.updateRequestStatus = async (req, res) => {
 
     await request.save();
     await request.populate(['material', 'industry', 'adminNotes.addedBy']);
-
-    try {
-      await EmailService.sendStatusUpdate(request);
-    } catch (emailError) {
-      console.error('Error sending status update email:', emailError);
-    }
 
     res.json({
       success: true,

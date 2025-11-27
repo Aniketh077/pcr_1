@@ -1,0 +1,163 @@
+ECO MARKETPLACE - COMPLETE BUILD
+
+====================================
+SETUP INSTRUCTIONS
+====================================
+
+1. BACKEND SETUP
+   Location: /project/server/
+
+   Steps:
+   cd /path/to/project/server
+   npm install
+   npm start (or npm run dev for development)
+
+   Server runs on: http://localhost:5000
+
+2. FRONTEND SETUP
+   Location: /project/ecotrade/
+
+   Steps:
+   cd /path/to/project/ecotrade
+   npm install
+   npm run dev
+
+   Frontend runs on: http://localhost:5173
+
+3. ENVIRONMENT VARIABLES
+
+   Backend (.env in server folder):
+   MONGODB_URI=mongodb://localhost:27017/eco_marketplace
+   JWT_SECRET=your_jwt_secret_here
+   PORT=5000
+   NODE_ENV=development
+
+   Frontend (.env in ecotrade folder):
+   VITE_API_URL=http://localhost:5000
+
+====================================
+FEATURES
+====================================
+
+✅ Guest Browsing (No Auth)
+   - Browse industries
+   - Filter materials by dynamic attributes
+   - View material details
+   - Submit requests (email OR phone required)
+
+✅ Admin Dashboard (Auth Required)
+   - Login at: http://localhost:5173/login
+   - Manage industries
+   - Manage materials & inventory
+   - Process buyer requests
+   - View analytics
+
+✅ Request Workflow
+   New → Reviewed → Confirmed → Dispatched → Completed
+
+✅ Stock Management
+   - Auto-deduction on confirmation
+   - Low stock alerts
+   - MOQ validation
+
+====================================
+API ENDPOINTS
+====================================
+
+Public (No Auth):
+- GET  /api/industries
+- GET  /api/materials
+- GET  /api/materials/:id
+- POST /api/buyer-requests
+
+Admin (Auth Required):
+- POST /api/industries
+- POST /api/materials
+- GET  /api/buyer-requests
+- PATCH /api/buyer-requests/:id/status
+- GET  /api/analytics/dashboard
+
+====================================
+CLEANED UP FILES
+====================================
+
+✅ Removed:
+- All .md documentation files
+- Razorpay integration
+- Email notification system
+- Old e-commerce files (cart, orders, wishlist)
+- Unused routes and controllers
+
+✅ Simplified:
+- Email OR Phone (at least one required)
+- Clean server.js with only Eco Marketplace routes
+- Streamlined frontend with only necessary pages
+
+====================================
+DATABASE SETUP
+====================================
+
+1. Start MongoDB:
+   mongod
+
+2. Database will be created automatically: eco_marketplace
+
+3. Collections:
+   - industries
+   - materials
+   - buyerrequests
+   - users (admin)
+
+====================================
+FIRST TIME SETUP
+====================================
+
+1. Create admin user via MongoDB:
+   use eco_marketplace
+   db.users.insertOne({
+     name: "Admin",
+     email: "admin@ecomarketplace.com",
+     password: "$2a$10$hashed_password_here",
+     role: "admin",
+     isActive: true
+   })
+
+2. Create sample industry via API or MongoDB
+
+3. Add materials to the industry
+
+4. Test guest request submission
+
+====================================
+BUILD STATUS
+====================================
+
+✅ Backend: Complete & Clean
+✅ Frontend: Complete & Clean
+✅ Models: Industry, Material, BuyerRequest
+✅ Controllers: All working
+✅ Routes: Only Eco Marketplace routes
+✅ Forms: Email OR Phone validation
+✅ Admin Dashboard: Full CRUD operations
+
+====================================
+ACCESS
+====================================
+
+Public Pages:
+- Home: http://localhost:5173/
+- Materials: http://localhost:5173/eco-materials
+- Material Detail: http://localhost:5173/eco-materials/:id
+
+Admin Pages:
+- Dashboard: http://localhost:5173/admin/eco-home
+- Industries: http://localhost:5173/admin/eco-industries
+- Materials: http://localhost:5173/admin/eco-materials
+- Requests: http://localhost:5173/admin/eco-requests
+
+API Health:
+- http://localhost:5000/api/health
+
+====================================
+READY FOR PRODUCTION!
+====================================

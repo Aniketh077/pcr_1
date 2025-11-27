@@ -42,6 +42,12 @@ export default function MaterialDetailPage() {
 
   const handleSubmitRequest = async (e) => {
     e.preventDefault();
+
+    if (!formData.buyerEmail && !formData.buyerMobile) {
+      alert('Please provide either email or mobile number');
+      return;
+    }
+
     try {
       setSubmitting(true);
       const res = await buyerRequestAPI.create({
@@ -188,19 +194,19 @@ export default function MaterialDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email *
+                    Email <span className="text-gray-500 text-xs">(Email or Mobile required)</span>
                   </label>
                   <input
                     type="email"
-                    required
                     value={formData.buyerEmail}
                     onChange={(e) => setFormData({ ...formData, buyerEmail: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="your@email.com"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Mobile Number *
+                    Mobile Number <span className="text-gray-500 text-xs">(Email or Mobile required)</span>
                   </label>
                   <div className="flex gap-2">
                     <select
@@ -214,10 +220,10 @@ export default function MaterialDetailPage() {
                     </select>
                     <input
                       type="tel"
-                      required
                       value={formData.buyerMobile}
                       onChange={(e) => setFormData({ ...formData, buyerMobile: e.target.value })}
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="9876543210"
                     />
                   </div>
                 </div>

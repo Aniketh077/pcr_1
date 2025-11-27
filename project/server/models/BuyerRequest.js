@@ -13,13 +13,11 @@ const buyerRequestSchema = new mongoose.Schema({
   },
   buyerEmail: {
     type: String,
-    required: true,
     lowercase: true,
     trim: true
   },
   buyerMobile: {
     type: String,
-    required: true,
     trim: true
   },
   countryCode: {

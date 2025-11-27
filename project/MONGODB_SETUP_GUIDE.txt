@@ -1,0 +1,295 @@
+ECO MARKETPLACE - MONGODB SETUP GUIDE
+=====================================
+
+⚠️ IMPORTANT: MongoDB is NOT installed in the current environment.
+You need to set this up on YOUR LOCAL MACHINE.
+
+## STEP 1: INSTALL MONGODB
+
+### For Windows:
+1. Download MongoDB Community Server from:
+   https://www.mongodb.com/try/download/community
+
+2. Run the installer (.msi file)
+   - Choose "Complete" installation
+   - Install MongoDB as a Service (recommended)
+   - Install MongoDB Compass (GUI tool, optional but helpful)
+
+3. MongoDB will be installed at:
+   C:\Program Files\MongoDB\Server\7.0\
+
+4. Add to PATH (if not done automatically):
+   - Open System Environment Variables
+   - Add: C:\Program Files\MongoDB\Server\7.0\bin
+
+### For Mac:
+```bash
+# Install using Homebrew
+brew tap mongodb/brew
+brew install mongodb-community
+
+# Start MongoDB as a service
+brew services start mongodb-community
+```
+
+### For Linux (Ubuntu/Debian):
+```bash
+# Import MongoDB public key
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -
+
+# Create list file
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+# Update and install
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+# Start MongoDB
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+## STEP 2: START MONGODB
+
+### Windows:
+```cmd
+# If installed as service (automatic)
+net start MongoDB
+
+# Or manually
+mongod --dbpath C:\data\db
+```
+
+### Mac:
+```bash
+# If using Homebrew
+brew services start mongodb-community
+
+# Or manually
+mongod --config /usr/local/etc/mongod.conf
+```
+
+### Linux:
+```bash
+sudo systemctl start mongod
+sudo systemctl status mongod
+```
+
+## STEP 3: VERIFY MONGODB IS RUNNING
+
+Open a new terminal and run:
+```bash
+# Test connection
+mongosh
+
+# Or for older versions
+mongo
+
+# You should see:
+# MongoDB shell version...
+# connecting to: mongodb://127.0.0.1:27017/
+```
+
+## STEP 4: CREATE DATABASE AND COLLECTION
+
+```bash
+# Connect to MongoDB
+mongosh
+
+# Create database
+use eco_marketplace
+
+# Create collections (optional, will be created automatically)
+db.createCollection("users")
+db.createCollection("industries")
+db.createCollection("materials")
+db.createCollection("buyer_requests")
+
+# Exit
+exit
+```
+
+## STEP 5: UPDATE BACKEND CONFIGURATION
+
+Your backend is already configured! The .env file has:
+```
+MONGODB_URI=mongodb://localhost:27017/eco_marketplace
+ADMIN_EMAIL=aniketh0701@gmail.com
+ADMIN_PASSWORD=Admin@123
+```
+
+## STEP 6: INSTALL BACKEND DEPENDENCIES
+
+```bash
+cd project/server
+npm install
+```
+
+Required packages (already in package.json):
+- express
+- mongoose
+- bcryptjs
+- jsonwebtoken
+- cors
+- dotenv
+
+## STEP 7: START THE BACKEND
+
+```bash
+cd project/server
+node server.js
+```
+
+You should see:
+```
+✅ Eco Marketplace Server running on port 5000
+📊 Environment: development
+🗄️  Database: Connected
+✅ Admin user created successfully
+```
+
+If you see this error:
+```
+❌ Database connection error: MongooseError: Operation buffering timed out
+```
+
+Then MongoDB is NOT running. Go back to Step 2.
+
+## STEP 8: START THE FRONTEND
+
+Open a NEW terminal:
+```bash
+cd project/ecotrade
+npm install
+npm run dev
+```
+
+Visit: http://localhost:5173
+
+## STEP 9: TEST ADMIN LOGIN
+
+1. Go to: http://localhost:5173/admin/login
+2. Enter:
+   - Email: aniketh0701@gmail.com
+   - Password: Admin@123
+3. Click "Sign In"
+4. Should redirect to admin dashboard
+
+## STEP 10: TEST REQUEST FOR QUOTE
+
+1. Go to: http://localhost:5173/eco-materials
+2. Click on any material
+3. Click "Request for Quote" button
+4. Fill the form:
+   - Buyer Name: Test User
+   - Company Name: Test Company
+   - Email: test@example.com (OR Mobile: +1234567890)
+   - Quantity: 100
+5. Submit
+6. Should see confirmation page with Request ID
+
+## TROUBLESHOOTING
+
+### Error: "mongod: command not found"
+- MongoDB is not installed or not in PATH
+- Reinstall and add to PATH
+
+### Error: "MongoNetworkError: connect ECONNREFUSED"
+- MongoDB is not running
+- Start MongoDB service (see Step 2)
+
+### Error: "Authentication failed"
+- Admin user not created
+- Check server logs for "Admin user created"
+
+### Port 27017 already in use
+```bash
+# Windows
+netstat -ano | findstr :27017
+
+# Mac/Linux
+lsof -i :27017
+
+# Kill the process if needed
+```
+
+### Port 5000 already in use
+```bash
+# Change PORT in server/.env
+PORT=5001
+```
+
+## MONGODB COMPASS (GUI Tool)
+
+If you installed MongoDB Compass:
+1. Open MongoDB Compass
+2. Connect to: mongodb://localhost:27017
+3. Navigate to "eco_marketplace" database
+4. View collections: users, industries, materials, buyer_requests
+5. You can see all data, queries, and indexes
+
+## USEFUL MONGODB COMMANDS
+
+```bash
+# Connect to MongoDB
+mongosh
+
+# Show all databases
+show dbs
+
+# Use eco_marketplace
+use eco_marketplace
+
+# Show all collections
+show collections
+
+# Count documents
+db.users.countDocuments()
+db.buyer_requests.countDocuments()
+
+# Find all requests
+db.buyer_requests.find().pretty()
+
+# Find admin user
+db.users.findOne({role: "admin"})
+
+# Clear a collection (careful!)
+db.buyer_requests.deleteMany({})
+
+# Drop database (careful!)
+db.dropDatabase()
+```
+
+## PRODUCTION DEPLOYMENT
+
+For production, use MongoDB Atlas (cloud):
+1. Create account at https://www.mongodb.com/atlas
+2. Create free cluster
+3. Get connection string
+4. Update MONGODB_URI in .env:
+   ```
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/eco_marketplace?retryWrites=true&w=majority
+   ```
+
+## CURRENT STATUS
+
+✅ Backend code is ready (Mongoose models, controllers, routes)
+✅ Frontend code is ready (React components, API calls)
+✅ Admin login page at /admin/login
+✅ Request for Quote button functional
+✅ .env configured with your admin credentials
+
+❌ MongoDB NOT installed in this environment
+❌ Cannot test until you install MongoDB locally
+
+## NEXT STEPS
+
+1. Install MongoDB on your local machine (Step 1)
+2. Start MongoDB service (Step 2)
+3. Verify connection (Step 3)
+4. Start backend (Step 7)
+5. Start frontend (Step 8)
+6. Test admin login (Step 9)
+7. Test Request for Quote (Step 10)
+
+Once MongoDB is running, everything will work end-to-end!

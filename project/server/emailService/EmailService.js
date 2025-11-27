@@ -17,6 +17,10 @@ const {
   orderAdminNotificationTemplate,
   orderStatusUpdateTemplate
 } = require('./templates/orderTemplates');
+const {
+  requestConfirmationEmail,
+  statusUpdateEmail
+} = require('./templates/requestTemplates');
 
 class EmailService {
   constructor() {
@@ -693,6 +697,44 @@ const customerMailOptions = {
       return { success: true, message: 'WhatsApp notification queued' };
     } catch (error) {
       console.error('Error sending WhatsApp notification:', error);
+      throw error;
+    }
+  }
+
+  async sendRequestConfirmation(request, material) {
+    try {
+      const emailContent = requestConfirmationEmail(request, material);
+      const mailOptions = {
+        from: `"${process.env.APP_NAME}" <${process.env.GMAIL_USER}>`,
+        to: request.buyerEmail,
+        subject: emailContent.subject,
+        html: emailContent.html
+      };
+
+      const result = await this.sendMail(mailOptions);
+      console.log('Request confirmation email sent:', result.messageId);
+      return result;
+    } catch (error) {
+      console.error('Error sending request confirmation:', error);
+      throw error;
+    }
+  }
+
+  async sendStatusUpdate(request) {
+    try {
+      const emailContent = statusUpdateEmail(request);
+      const mailOptions = {
+        from: `"${process.env.APP_NAME}" <${process.env.GMAIL_USER}>`,
+        to: request.buyerEmail,
+        subject: emailContent.subject,
+        html: emailContent.html
+      };
+
+      const result = await this.sendMail(mailOptions);
+      console.log('Status update email sent:', result.messageId);
+      return result;
+    } catch (error) {
+      console.error('Error sending status update:', error);
       throw error;
     }
   }

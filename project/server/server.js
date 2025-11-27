@@ -19,6 +19,10 @@ const wishlistRoutes = require('./routes/wishlistRoutes');
 const stockNotificationRoutes = require('./routes/stockNotificationRoutes');
 const otpRoutes = require('./routes/otpRoutes');
 const businessRoutes = require('./routes/businessRoutes');
+const industryRoutes = require('./routes/industryRoutes');
+const materialRoutes = require('./routes/materialRoutes');
+const buyerRequestRoutes = require('./routes/buyerRequestRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 
 const app = express();
@@ -115,7 +119,11 @@ app.use('/api/recycle', recycleRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/stock-notifications', stockNotificationRoutes);
 app.use('/api/otp', otpRoutes);
-app.use('/api/business', businessRoutes); 
+app.use('/api/business', businessRoutes);
+app.use('/api/industries', industryRoutes);
+app.use('/api/materials', materialRoutes);
+app.use('/api/buyer-requests', buyerRequestRoutes);
+app.use('/api/analytics', analyticsRoutes); 
 
 // Health check route with environment info
 app.get('/api/health', (req, res) => {
@@ -131,15 +139,16 @@ app.get('/api/health', (req, res) => {
 // Root route
 app.get('/', (req, res) => {
   res.json({
-    message: 'Reeown API Server - Premium Refurbished Electronics',
+    message: 'Eco Marketplace API Server - B2B PCR Materials Platform',
     environment: process.env.NODE_ENV || 'development',
     status: 'running',
     endpoints: {
       health: '/api/health',
       auth: '/api/auth',
-      products: '/api/products',
-      cart: '/api/cart',
-      orders: '/api/orders',
+      industries: '/api/industries',
+      materials: '/api/materials',
+      buyerRequests: '/api/buyer-requests',
+      analytics: '/api/analytics',
       admin: '/api/admin',
     }
   });

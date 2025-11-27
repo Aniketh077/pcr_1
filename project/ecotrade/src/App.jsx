@@ -33,6 +33,9 @@ import RepairPage from "./pages/RepairPage";
 import RecyclePage from "./pages/RecyclePage";
 import BusinessPage from "./pages/BusinessPage";
 import WishlistPage from "./pages/WishlistPage";
+import EcoHomePage from "./pages/EcoHomePage";
+import MaterialsPage from "./pages/MaterialsPage";
+import MaterialDetailPage from "./pages/MaterialDetailPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders/AdminMainOrders";
@@ -84,6 +87,12 @@ function App() {
                 <Routes>
                   {/* Customer Routes */}
                   <Route path="/" element={<HomePage />} />
+
+                  {/* Eco Marketplace Routes */}
+                  <Route path="/eco-home" element={<EcoHomePage />} />
+                  <Route path="/eco-industries" element={<EcoHomePage />} />
+                  <Route path="/eco-materials" element={<MaterialsPage />} />
+                  <Route path="/eco-materials/:id" element={<MaterialDetailPage />} />
                   <Route
                     path="/products/:collectionName"
                     element={<ProductsPage />}

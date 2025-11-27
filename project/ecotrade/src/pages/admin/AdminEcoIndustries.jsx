@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { industryAPI } from '../../api/industryAPI';
-import { uploadAPI } from '../../api/uploadAPI';
 
 export default function AdminEcoIndustries() {
   const [industries, setIndustries] = useState([]);

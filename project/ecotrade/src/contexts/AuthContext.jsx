@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getMe } from '../store/slices/authSlice'; // <-- 1. IMPORT getMe
-import { loginUser, registerUser, logout as logoutAction, clearError } from '../store/slices/authSlice';
+import { authAPI } from '../api/authAPI';
 
 const AuthContext = createContext();
 
@@ -14,77 +12,98 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const dispatch = useDispatch();
-  const { user, isAuthenticated, isLoading, error } = useSelector(state => state.auth);
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          await dispatch(getMe());
+
+        if (token && storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          setIsAuthenticated(true);
         }
       } catch (err) {
         console.error("Auth initialization error:", err);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setIsInitialized(true);
       }
     };
 
     initializeAuth();
-  }, [dispatch]); 
+  }, []);
 
   const login = async (credentials) => {
     try {
-      dispatch(clearError());
-      const result = await dispatch(loginUser(credentials));
-      
-      if (loginUser.fulfilled.match(result)) {
-        return { success: true, user: result.payload };
-      } else if (loginUser.rejected.match(result)) {
-        return { 
-          success: false, 
-          error: result.payload?.message || 'Login failed' 
-        };
+      setIsLoading(true);
+      setError(null);
+
+      const response = await authAPI.login(credentials);
+
+      if (response.data.success) {
+        const { token, user: userData } = response.data.data;
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        setUser(userData);
+        setIsAuthenticated(true);
+
+        return { success: true, user: userData };
       }
-      
-      return { success: false, error: 'Login failed' };
-    } catch (error) {
-      return { success: false, error: 'An unexpected error occurred' };
+
+      return { success: false, error: response.data.message || 'Login failed' };
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'An unexpected error occurred';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const register = async (userData) => {
     try {
-      dispatch(clearError());
-      const result = await dispatch(registerUser(userData));
-      
-      if (registerUser.fulfilled.match(result)) {
-        return { 
-          success: true, 
-          message: result.payload.message || 'Registration successful! Please check your email to verify your account.',
-          requiresVerification: result.payload.requiresVerification || true
-        };
-      } else if (registerUser.rejected.match(result)) {
-        return { 
-          success: false, 
-          error: result.payload?.message || 'Registration failed' 
+      setIsLoading(true);
+      setError(null);
+
+      const response = await authAPI.register(userData);
+
+      if (response.data.success) {
+        return {
+          success: true,
+          message: response.data.message || 'Registration successful!',
+          requiresVerification: false
         };
       }
-      
-      return { success: false, error: 'Registration failed' };
-    } catch (error) {
-      return { success: false, error: error.message || 'Registration failed' };
+
+      return { success: false, error: response.data.message || 'Registration failed' };
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Registration failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = () => {
-    dispatch(logoutAction());
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   const clearAuthError = () => {
-    dispatch(clearError());
+    setError(null);
   };
 
   const isAdmin = user?.role === 'admin';
@@ -104,8 +123,11 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {/* Only render children once initialization is complete */}
-      {isInitialized ? children : null /* Or a loading spinner */}
+      {isInitialized ? children : (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 };
